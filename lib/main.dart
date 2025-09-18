@@ -5,7 +5,6 @@ import 'services/permissions_service.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Demande de permission notifications
   await PermissionsService.requestNotificationPermission();
 
   await PermissionsService.requestLocationPermission();
@@ -21,7 +20,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Sorties en Ville',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: const HomeScreen(), // ton écran principal
+      home: const HomeScreen(), 
     );
   }
 }

@@ -3,11 +3,10 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:sortir_a_nantes/models/event.dart';
 import 'package:sortir_a_nantes/screens/parkings/parking_screen.dart';
-import 'package:sortir_a_nantes/screens/velib/naolib_map_screen.dart'; // <- nouvel import
+import 'package:sortir_a_nantes/screens/velib/naolib_event_screen.dart';
 
 class EventDetailScreen extends StatelessWidget {
   final Event event;
-  
 
   const EventDetailScreen({super.key, required this.event});
 
@@ -82,16 +81,16 @@ class EventDetailScreen extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => NaolibMapScreen(
-                            eventLat: event.latitude,
-                            eventLon: event.longitude,
-                            eventName: event.name,
-                          ),
+                          builder: (context) => NaolibEventScreen(event: event),
                         ),
                       );
                     },
-                    icon: const Icon(Icons.pedal_bike),
-                    label: const Text("Voir les vélos Naolib"),
+                    icon:
+                        const Icon(Icons.directions_bike, color: Colors.white),
+                    label: const Text("Trouver un vélo"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                    ),
                   ),
                 ],
               ),

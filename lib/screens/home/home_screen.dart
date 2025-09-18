@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:sortir_a_nantes/screens/events/events_list_screen.dart';
-import 'package:sortir_a_nantes/screens/velib/naolib_map_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -47,17 +46,6 @@ class HomeScreen extends StatelessWidget {
                 icon: const Icon(Icons.list),
                 label: const Text("Voir les événements"),
               ),
-              // ElevatedButton.icon(
-              //   onPressed: () {
-              //     Navigator.push(
-              //       context,
-              //       MaterialPageRoute(
-              //           builder: (context) => const NaolibMapScreen()),
-              //     );
-              //   },
-              //   icon: const Icon(Icons.pedal_bike),
-              //   label: const Text("Stations vélo Naolib"),
-              // ),
             ],
           ),
         ),
