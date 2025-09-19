@@ -4,6 +4,9 @@ import 'package:latlong2/latlong.dart';
 import 'package:sortir_a_nantes/models/event.dart';
 import 'package:sortir_a_nantes/screens/parkings/parking_screen.dart';
 import 'package:sortir_a_nantes/screens/velib/naolib_event_screen.dart';
+import 'package:sortir_a_nantes/services/favorite_service.dart';
+import 'package:sortir_a_nantes/services/notification_service.dart';
+import 'package:sortir_a_nantes/widgets/notification_pluging.dart';
 
 class EventDetailScreen extends StatelessWidget {
   final Event event;
@@ -74,6 +77,22 @@ class EventDetailScreen extends StatelessWidget {
                     },
                     icon: const Icon(Icons.local_parking),
                     label: const Text("Voir les parkings disponibles"),
+                  ),
+                  ElevatedButton.icon(
+                    onPressed: () async {
+                      await NotificationService().scheduleNotification(
+                        id: int.parse(event.id),
+                        title: event.name,
+                        body: event.description,
+                        scheduledDate: event.date, // Ensure event.date is a DateTime
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text('Notification programmée !')),
+                      );
+                    },
+                    icon: const Icon(Icons.notifications),
+                    label: const Text("Me rappeler de cet événement"),
                   ),
                   const SizedBox(height: 12),
                   ElevatedButton.icon(

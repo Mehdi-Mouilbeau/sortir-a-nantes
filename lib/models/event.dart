@@ -16,6 +16,7 @@ class Event {
   final bool isFree; // "gratuit"
   final double latitude;
   final double longitude;
+  bool isFavorite;
 
   Event({
     required this.id,
@@ -35,6 +36,7 @@ class Event {
     required this.isFree,
     required this.latitude,
     required this.longitude,
+    this.isFavorite = false
   });
 
   factory Event.fromJson(Map<String, dynamic> json) {

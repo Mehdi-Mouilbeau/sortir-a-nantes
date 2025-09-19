@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:sortir_a_nantes/screens/home/home_screen.dart';
+import 'package:sortir_a_nantes/services/notification_service.dart';
 import 'services/permissions_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await PermissionsService.requestNotificationPermission();
+  // Initialisation du service de notifications
+  await NotificationService().init();
 
+  // Demande des permissions
+  await PermissionsService.requestNotificationPermission();
   await PermissionsService.requestLocationPermission();
 
   runApp(const MyApp());
@@ -20,7 +24,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Sorties en Ville',
       theme: ThemeData(primarySwatch: Colors.blue),
-      home: const HomeScreen(), 
+      home: const HomeScreen(),
     );
   }
 }
