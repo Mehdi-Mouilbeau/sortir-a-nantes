@@ -4,6 +4,7 @@ import './event_detail_screen.dart';
 import '../../services/event_service.dart';
 import '../../widgets/city_dropdown.dart';
 import '../../widgets/date_filter_dropdown.dart';
+import '../../widgets/theme_dropdown.dart';
 
 enum DateFilter {
   today,
@@ -26,10 +27,14 @@ class _EventListScreenState extends State<EventListScreen> {
   DateFilter? selectedDateFilter;
   DateTimeRange? customRange;
 
+  List<String> allThemes = [];
+  List<String> selectedThemes = [];
+
   @override
   void initState() {
     super.initState();
     _loadCities();
+    _loadThemes();
   }
 
   void _loadCities() async {
@@ -39,7 +44,18 @@ class _EventListScreenState extends State<EventListScreen> {
         cities = fetchedCities;
       });
     } catch (e) {
-      print("Erreur chargement villes: $e");
+      debugPrint("Erreur chargement villes: $e");
+    }
+  }
+
+  void _loadThemes() async {
+    try {
+      final fetchedThemes = await EventService().fetchThemes();
+      setState(() {
+        allThemes = fetchedThemes;
+      });
+    } catch (e) {
+      debugPrint("Erreur chargement thèmes: $e");
     }
   }
 
@@ -72,6 +88,12 @@ class _EventListScreenState extends State<EventListScreen> {
       default:
         return null;
     }
+  }
+
+  bool get hasFilters {
+    return (selectedCity != null && selectedCity!.isNotEmpty) ||
+        selectedDateFilter != null ||
+        selectedThemes.isNotEmpty;
   }
 
   @override
@@ -119,45 +141,61 @@ class _EventListScreenState extends State<EventListScreen> {
             },
           ),
 
-          // Liste des événements
-          Expanded(
-            child: FutureBuilder<List<Event>>(
-              future: EventService().fetchEvents(
-                city: selectedCity,
-                startDate: startDate,
-                endDate: endDate,
-              ),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text("Erreur : ${snapshot.error}"));
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(child: Text("Aucun évènement trouvé"));
-                }
-
-                final events = snapshot.data!;
-                return ListView.builder(
-                  itemCount: events.length,
-                  itemBuilder: (context, index) {
-                    final event = events[index];
-                    return ListTile(
-                      title: Text(event.name),
-                      subtitle: Text("${event.placeName} - ${event.city}"),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                EventDetailScreen(event: event),
-                          ),
-                        );
-                      },
-                    );
-                  },
-                );
+          if (allThemes.isNotEmpty)
+            ThemeDropdown(
+              allThemes: allThemes,
+              selectedThemes: selectedThemes,
+              onChanged: (values) {
+                setState(() {
+                  selectedThemes = values;
+                });
               },
             ),
+
+          // Liste des événements
+          Expanded(
+            child: hasFilters
+                ? FutureBuilder<List<Event>>(
+                    future: EventService().fetchEvents(
+                      city: selectedCity,
+                      startDate: startDate,
+                      endDate: endDate,
+                      themes: selectedThemes,
+                    ),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text("Erreur : ${snapshot.error}"));
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return const Center(child: Text("Aucun évènement trouvé"));
+                      }
+
+                      final events = snapshot.data!;
+                      return ListView.builder(
+                        itemCount: events.length,
+                        itemBuilder: (context, index) {
+                          final event = events[index];
+                          return ListTile(
+                            title: Text(event.name),
+                            subtitle: Text("${event.placeName} - ${event.city}"),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      EventDetailScreen(event: event),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      );
+                    },
+                  )
+                : const Center(
+                    child: Text("Choisis une ville, une date ou un thème pour afficher les évènements"),
+                  ),
           ),
         ],
       ),

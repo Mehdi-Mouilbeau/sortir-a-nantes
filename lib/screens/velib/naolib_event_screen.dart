@@ -87,7 +87,6 @@ class _NaolibEventScreenState extends State<NaolibEventScreen> {
                   eventLoc.longitude,
                 );
 
-                // Marqueurs sur la carte
                 final markers = <Marker>[
                   Marker(
                     point: _currentLocation!,
@@ -121,7 +120,6 @@ class _NaolibEventScreenState extends State<NaolibEventScreen> {
 
                 return Column(
                   children: [
-                    // Mini-map
                     SizedBox(
                       height: 250,
                       child: FlutterMap(
@@ -141,11 +139,9 @@ class _NaolibEventScreenState extends State<NaolibEventScreen> {
                       ),
                     ),
 
-                    // Listes en dessous
                     Expanded(
                       child: ListView(
                         children: [
-                          // Section "prendre"
                           const Padding(
                             padding: EdgeInsets.all(8.0),
                             child: Text("🚴‍♂️ Prendre un vélo près de moi",
@@ -168,7 +164,6 @@ class _NaolibEventScreenState extends State<NaolibEventScreen> {
                               )),
                           const Divider(),
 
-                          // Section "déposer"
                           const Padding(
                             padding: EdgeInsets.all(8.0),
                             child: Text(

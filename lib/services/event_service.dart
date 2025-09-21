@@ -6,7 +6,6 @@ class EventService {
   final String baseUrl =
       "https://data.nantesmetropole.fr/api/explore/v2.1/catalog/datasets/244400404_agenda-evenements-nantes-metropole_v2/records";
 
-  /// utilitaire pour formatter la date au bon format
   String _formatDate(DateTime date) {
     return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
   }
@@ -15,15 +14,18 @@ class EventService {
     String? city,
     DateTime? startDate,
     DateTime? endDate,
+    List<String>? themes,
     int limit = 50,
   }) async {
     final queryParams = {
       "limit": "$limit",
     };
 
+    String whereClause = "";
+
     // filtre par ville
     if (city != null && city.isNotEmpty) {
-      queryParams['where'] = "ville = \"$city\"";
+      whereClause = "ville = \"$city\"";
     }
 
     // filtre par date
@@ -31,13 +33,26 @@ class EventService {
       final start = _formatDate(startDate);
       final end = _formatDate(endDate);
 
-      // si on a déjà une clause WHERE (ex : ville), on concatène
+      if (whereClause.isNotEmpty) {
+        whereClause += " AND date >= '$start' AND date <= '$end'";
+      } else {
+        whereClause = "date >= '$start' AND date <= '$end'";
+      }
+    }
+
+    // filtre par thèmes
+    if (themes != null && themes.isNotEmpty) {
+      final inClause = themes.map((t) => "'$t'").join(", ");
       if (queryParams.containsKey('where')) {
         queryParams['where'] =
-            "${queryParams['where']} AND date >= '$start' AND date <= '$end'";
+            "${queryParams['where']} AND themes_libelles IN ($inClause)";
       } else {
-        queryParams['where'] = "date >= '$start' AND date <= '$end'";
+        queryParams['where'] = "themes_libelles IN ($inClause)";
       }
+    }
+
+    if (whereClause.isNotEmpty) {
+      queryParams['where'] = whereClause;
     }
 
     final uri = Uri.parse(baseUrl).replace(queryParameters: queryParams);
@@ -48,7 +63,6 @@ class EventService {
       final data = json.decode(response.body);
       final List eventsJson = data['results'];
 
-      // transformation en Event + suppression des doublons
       final events = eventsJson.map((json) => Event.fromJson(json)).toList();
       final uniqueEvents = {for (var e in events) e.id: e}.values.toList();
 
@@ -58,7 +72,6 @@ class EventService {
     }
   }
 
-  /// récupérer la liste des villes disponibles
   Future<List<String>> fetchCities() async {
     final uri = Uri.parse(baseUrl).replace(queryParameters: {
       "group_by": "ville",
@@ -76,6 +89,29 @@ class EventService {
           .toList();
     } else {
       throw Exception("Erreur lors du chargement des villes");
+    }
+  }
+
+  Future<List<String>> fetchThemes() async {
+    final uri = Uri.parse(baseUrl).replace(queryParameters: {
+      "group_by": "themes_libelles",
+    });
+
+    final response = await http.get(uri);
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      final List results = data['results'];
+
+      return results
+          .map((e) => e['themes_libelles'])
+          .where((t) => t != null && t.toString().isNotEmpty)
+          .expand((t) => (t is List ? t : [t]))
+          .cast<String>()
+          .toSet()
+          .toList();
+    } else {
+      throw Exception("Erreur lors du chargement des thèmes");
     }
   }
 }

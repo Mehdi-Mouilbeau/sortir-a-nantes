@@ -1,15 +1,20 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:sortir_a_nantes/models/event.dart';
+import 'package:sortir_a_nantes/screens/events/event_detail_screen.dart';
 
 class AgendaCalendar extends StatefulWidget {
   final List<Event> events;
   final Function(DateTime, List<Event>)? onDaySelected;
+  final VoidCallback?
+      onEventChanged;
 
   const AgendaCalendar({
     super.key,
     required this.events,
     this.onDaySelected,
+    this.onEventChanged,
   });
 
   @override
@@ -27,6 +32,15 @@ class _AgendaCalendarState extends State<AgendaCalendar> {
     super.initState();
     _selectedDay = _focusedDay;
     _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));
+  }
+
+  @override
+  void didUpdateWidget(covariant AgendaCalendar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // si la liste d'évènements fournie par le parent a changé, on met à jour les events affichés
+    if (!listEquals(oldWidget.events, widget.events)) {
+      _selectedEvents.value = _getEventsForDay(_selectedDay!);
+    }
   }
 
   List<Event> _getEventsForDay(DateTime day) {
@@ -97,7 +111,6 @@ class _AgendaCalendarState extends State<AgendaCalendar> {
         ),
         const SizedBox(height: 8),
         Expanded(
-          // 🔥 corrige l’overflow
           child: ValueListenableBuilder<List<Event>>(
             valueListenable: _selectedEvents,
             builder: (context, value, _) {
@@ -109,6 +122,20 @@ class _AgendaCalendarState extends State<AgendaCalendar> {
                                 title: Text(e.name),
                                 subtitle: Text(e.date.toString()),
                                 leading: const Icon(Icons.event),
+                                onTap: () async {
+                                  await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          EventDetailScreen(event: e),
+                                    ),
+                                  );
+                                  _selectedEvents.value =
+                                      _getEventsForDay(_selectedDay!);
+                                  if (widget.onEventChanged != null) {
+                                    widget.onEventChanged!();
+                                  }
+                                },
                               ))
                           .toList(),
                     );

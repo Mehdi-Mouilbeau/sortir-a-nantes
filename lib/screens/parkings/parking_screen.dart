@@ -127,7 +127,6 @@ class _ParkingScreenState extends State<ParkingScreen> {
 
           const SizedBox(height: 8),
 
-          // Liste textuelle
           Expanded(
             child: FutureBuilder<List<Parking>>(
               future: _nearbyParkingsFuture,

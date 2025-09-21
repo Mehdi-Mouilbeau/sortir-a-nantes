@@ -2,18 +2,18 @@ class Event {
   final String id;
   final String name;
   final String description;
-  final String theme;
+  final List<String> theme;
   final String type;
   final DateTime date;
   final String startTime;
   final String endTime;
-  final bool isFull; // "complet"
-  final String placeName; // "lieu"
-  final String address; // "adresse"
-  final String city; // "ville"
-  final String postalCode; // "code_postal"
-  final String? website; // "lieu_siteweb" (optionnel)
-  final bool isFree; // "gratuit"
+  final bool isFull; 
+  final String placeName; 
+  final String address; 
+  final String city; 
+  final String postalCode; 
+  final String? website; 
+  final bool isFree; 
   final double latitude;
   final double longitude;
 
@@ -43,8 +43,8 @@ class Event {
       name: json['nom'] ?? '',
       description: json['description_evt'] ?? '',
       theme: (json['themes_libelles'] as List<dynamic>?)?.isNotEmpty == true
-          ? (json['themes_libelles'] as List).first.toString()
-          : '',
+          ? (json['themes_libelles'] as List<dynamic>).map((e) => e.toString()).toList()
+          : <String>[],
       type: (json['types_libelles'] as List<dynamic>?)?.isNotEmpty == true
           ? (json['types_libelles'] as List).first.toString()
           : '',
@@ -80,14 +80,11 @@ class Event {
   /// Convertit l'objet en Map compatible avec `fromJson` (pour stockage local)
   Map<String, dynamic> toJson() {
     return {
-      // utilisation de 'id_manif' pour rester compatible avec fromJson
       'id_manif': id,
       'nom': name,
       'description_evt': description,
-      // stocke theme/type comme listes pour la compatibilité
       'themes_libelles': theme.isNotEmpty ? [theme] : [],
       'types_libelles': type.isNotEmpty ? [type] : [],
-      // garde isoString pour la date (fromJson sait parser ISO)
       'date': date.toIso8601String(),
       'heure_debut': startTime,
       'heure_fin': endTime,
@@ -98,10 +95,8 @@ class Event {
       'code_postal': postalCode,
       'lieu_siteweb': website,
       'gratuit': isFree ? 'oui' : 'non',
-      // latitude/longitude au niveau racine (fromJson gère aussi location_latlong)
       'latitude': latitude,
       'longitude': longitude,
-      // aussi fournir location_latlong au cas où
       'location_latlong': {'lat': latitude, 'lon': longitude},
     };
   }
