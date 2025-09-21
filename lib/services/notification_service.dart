@@ -12,8 +12,17 @@ class NotificationService {
     const AndroidInitializationSettings androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
-    const InitializationSettings initSettings =
-        InitializationSettings(android: androidSettings);
+    final DarwinInitializationSettings iosSettings =
+        DarwinInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
+    );
+
+    InitializationSettings initSettings = InitializationSettings(
+      android: androidSettings,
+      iOS: iosSettings,
+    );
 
     await _flutterLocalNotificationsPlugin.initialize(initSettings);
   }
@@ -28,19 +37,20 @@ class NotificationService {
         tz.TZDateTime.from(scheduledDate, tz.local);
 
     await _flutterLocalNotificationsPlugin.zonedSchedule(
-        id,
-        title,
-        body,
-        scheduledTZDate,
-        NotificationDetails(
-          android: AndroidNotificationDetails(
-            'event_channel',
-            'Rappels événements',
-            channelDescription: 'Notifications pour les événements',
-            importance: Importance.max,
-            priority: Priority.high,
-          ),
+      id,
+      title,
+      body,
+      scheduledTZDate,
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'event_channel',
+          'Rappels événements',
+          channelDescription: 'Notifications pour les événements',
+          importance: Importance.max,
+          priority: Priority.high,
         ),
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle);
+      ),
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+    );
   }
 }

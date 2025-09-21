@@ -1,35 +1,93 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sortir_a_nantes/main.dart';
 import 'package:sortir_a_nantes/models/event.dart';
 import 'package:sortir_a_nantes/screens/parkings/parking_screen.dart';
 import 'package:sortir_a_nantes/screens/velib/naolib_event_screen.dart';
-import 'package:sortir_a_nantes/services/favorite_service.dart';
 import 'package:sortir_a_nantes/services/notification_service.dart';
-import 'package:sortir_a_nantes/widgets/notification_pluging.dart';
 
-class EventDetailScreen extends StatelessWidget {
+class EventDetailScreen extends StatefulWidget {
   final Event event;
 
   const EventDetailScreen({super.key, required this.event});
 
   @override
+  State<EventDetailScreen> createState() => _EventDetailScreenState();
+}
+
+class _EventDetailScreenState extends State<EventDetailScreen> {
+  bool isPlanned = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadPlannedStatus();
+  }
+
+  Future<void> _loadPlannedStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    final plannedEvents = prefs.getStringList("plannedEvents") ?? [];
+    setState(() {
+      isPlanned = plannedEvents.contains(widget.event.id.toString());
+    });
+  }
+
+  Future<void> _togglePlanned() async {
+    final prefs = await SharedPreferences.getInstance();
+    final plannedEvents = prefs.getStringList("plannedEvents") ?? [];
+
+    if (isPlanned) {
+      plannedEvents.removeWhere((e) {
+        try {
+          final map = jsonDecode(e) as Map<String, dynamic>;
+          final storedId = (map['id_manif'] ?? map['id'] ?? '').toString();
+          return storedId == widget.event.id.toString();
+        } catch (_) {
+          return false;
+        }
+      });
+    } else {
+      plannedEvents.add(jsonEncode(widget.event.toJson()));
+    }
+
+    await prefs.setStringList("plannedEvents", plannedEvents);
+
+    setState(() {
+      isPlanned = !isPlanned;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(isPlanned
+            ? "Événement ajouté à mon agenda 🎉"
+            : "Événement retiré de mon agenda"),
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final LatLng eventLocation = LatLng(event.latitude, event.longitude);
+    final LatLng eventLocation =
+        LatLng(widget.event.latitude, widget.event.longitude);
 
     return Scaffold(
-      appBar: AppBar(title: Text(event.name)),
+      appBar: AppBar(title: Text(widget.event.name)),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              event.name,
+              widget.event.name,
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             const SizedBox(height: 8),
-            Text(event.description),
+            Text(widget.event.description),
             const SizedBox(height: 16),
             SizedBox(
               height: 250,
@@ -68,9 +126,9 @@ class EventDetailScreen extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) => ParkingScreen(
-                            eventLat: event.latitude,
-                            eventLon: event.longitude,
-                            eventName: event.name,
+                            eventLat: widget.event.latitude,
+                            eventLon: widget.event.longitude,
+                            eventName: widget.event.name,
                           ),
                         ),
                       );
@@ -80,11 +138,22 @@ class EventDetailScreen extends StatelessWidget {
                   ),
                   ElevatedButton.icon(
                     onPressed: () async {
+                      await flutterLocalNotificationsPlugin
+                          .resolvePlatformSpecificImplementation<
+                              IOSFlutterLocalNotificationsPlugin>()
+                          ?.requestPermissions(
+                              alert: true, badge: true, sound: true);
+
+                      await flutterLocalNotificationsPlugin
+                          .resolvePlatformSpecificImplementation<
+                              AndroidFlutterLocalNotificationsPlugin>()
+                          ?.requestNotificationsPermission();
+
                       await NotificationService().scheduleNotification(
-                        id: int.parse(event.id),
-                        title: event.name,
-                        body: event.description,
-                        scheduledDate: event.date, // Ensure event.date is a DateTime
+                        id: int.parse(widget.event.id),
+                        title: widget.event.name,
+                        body: widget.event.description,
+                        scheduledDate: widget.event.date,
                       );
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
@@ -96,11 +165,26 @@ class EventDetailScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   ElevatedButton.icon(
+                    onPressed: _togglePlanned,
+                    icon: Icon(isPlanned ? Icons.check : Icons.event_available,
+                        color: Colors.white),
+                    label: Text(isPlanned
+                        ? "Retirer de mon agenda"
+                        : "Ajouter à mon agenda"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: isPlanned
+                          ? Colors.red
+                          : const Color.fromRGBO(33, 150, 243, 1),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  ElevatedButton.icon(
                     onPressed: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => NaolibEventScreen(event: event),
+                          builder: (context) =>
+                              NaolibEventScreen(event: widget.event),
                         ),
                       );
                     },

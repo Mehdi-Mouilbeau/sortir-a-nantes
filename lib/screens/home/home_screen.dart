@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sortir_a_nantes/screens/agenda/agenda_screen.dart';
 import 'package:sortir_a_nantes/screens/events/events_list_screen.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -45,6 +46,18 @@ class HomeScreen extends StatelessWidget {
                 },
                 icon: const Icon(Icons.list),
                 label: const Text("Voir les événements"),
+              ),
+              ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AgendaScreen(),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.event_note),
+                label: const Text("Mon agenda"),
               ),
             ],
           ),

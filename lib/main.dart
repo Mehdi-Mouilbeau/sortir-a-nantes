@@ -1,17 +1,42 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:sortir_a_nantes/screens/home/home_screen.dart';
-import 'package:sortir_a_nantes/services/notification_service.dart';
-import 'services/permissions_service.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
-void main() async {
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('fr_FR', null);
 
-  // Initialisation du service de notifications
-  await NotificationService().init();
+  // --- Initialisation Android ---
+  const AndroidInitializationSettings initializationSettingsAndroid =
+      AndroidInitializationSettings('@mipmap/ic_launcher');
 
-  // Demande des permissions
-  await PermissionsService.requestNotificationPermission();
-  await PermissionsService.requestLocationPermission();
+  // --- Initialisation iOS / macOS ---
+  final DarwinInitializationSettings initializationSettingsDarwin =
+      DarwinInitializationSettings(
+    requestAlertPermission: false,
+    requestBadgePermission: false,
+    requestSoundPermission: false,
+  );
+
+
+
+  // --- Initialisation globale ---
+  final InitializationSettings initializationSettings = InitializationSettings(
+    android: initializationSettingsAndroid,
+    iOS: initializationSettingsDarwin,
+    macOS: initializationSettingsDarwin,
+  );
+
+  await flutterLocalNotificationsPlugin.initialize(
+    initializationSettings,
+    onDidReceiveNotificationResponse: (NotificationResponse response) async {
+      debugPrint("Notification tap: ${response.payload}");
+    },
+  );
 
   runApp(const MyApp());
 }
