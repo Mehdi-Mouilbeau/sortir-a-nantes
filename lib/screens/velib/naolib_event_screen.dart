@@ -131,8 +131,9 @@ class _NaolibEventScreenState extends State<NaolibEventScreen> {
                         children: [
                           TileLayer(
                             urlTemplate:
-                                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
                             subdomains: const ['a', 'b', 'c'],
+                            userAgentPackageName: 'com.example.sortir_a_nantes',
                           ),
                           MarkerLayer(markers: markers),
                         ],

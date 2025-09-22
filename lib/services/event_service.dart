@@ -15,44 +15,35 @@ class EventService {
     DateTime? startDate,
     DateTime? endDate,
     List<String>? themes,
-    int limit = 50,
+    int limit = 100,
   }) async {
     final queryParams = {
       "limit": "$limit",
     };
 
-    String whereClause = "";
+    final conditions = <String>[];
 
-    // filtre par ville
+    // Ville
     if (city != null && city.isNotEmpty) {
-      whereClause = "ville = \"$city\"";
+      conditions.add("ville = \"$city\"");
     }
 
-    // filtre par date
+    // Dates
     if (startDate != null && endDate != null) {
       final start = _formatDate(startDate);
       final end = _formatDate(endDate);
-
-      if (whereClause.isNotEmpty) {
-        whereClause += " AND date >= '$start' AND date <= '$end'";
-      } else {
-        whereClause = "date >= '$start' AND date <= '$end'";
-      }
+      conditions.add("date >= '$start' AND date <= '$end'");
     }
 
-    // filtre par thèmes
+    // Thèmes
     if (themes != null && themes.isNotEmpty) {
       final inClause = themes.map((t) => "'$t'").join(", ");
-      if (queryParams.containsKey('where')) {
-        queryParams['where'] =
-            "${queryParams['where']} AND themes_libelles IN ($inClause)";
-      } else {
-        queryParams['where'] = "themes_libelles IN ($inClause)";
-      }
+      conditions.add("themes_libelles IN ($inClause)");
     }
 
-    if (whereClause.isNotEmpty) {
-      queryParams['where'] = whereClause;
+    // Ensembel des trois
+    if (conditions.isNotEmpty) {
+      queryParams['where'] = conditions.join(" AND ");
     }
 
     final uri = Uri.parse(baseUrl).replace(queryParameters: queryParams);

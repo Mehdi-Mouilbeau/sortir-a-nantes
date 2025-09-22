@@ -16,6 +16,7 @@ class Event {
   final bool isFree; 
   final double latitude;
   final double longitude;
+  final String image;
 
   Event({
     required this.id,
@@ -35,6 +36,7 @@ class Event {
     required this.isFree,
     required this.latitude,
     required this.longitude,
+    required this.image,
   });
 
   factory Event.fromJson(Map<String, dynamic> json) {
@@ -42,6 +44,7 @@ class Event {
       id: (json['id_manif'] ?? json['id'] ?? '').toString(),
       name: json['nom'] ?? '',
       description: json['description_evt'] ?? '',
+      image: json['media_url'] ?? '',
       theme: (json['themes_libelles'] as List<dynamic>?)?.isNotEmpty == true
           ? (json['themes_libelles'] as List<dynamic>).map((e) => e.toString()).toList()
           : <String>[],
@@ -83,6 +86,7 @@ class Event {
       'id_manif': id,
       'nom': name,
       'description_evt': description,
+      'media_url': image,
       'themes_libelles': theme.isNotEmpty ? [theme] : [],
       'types_libelles': type.isNotEmpty ? [type] : [],
       'date': date.toIso8601String(),

@@ -18,7 +18,7 @@ class ThemeDropdown extends StatelessWidget {
     return MultiSelectDialogField<String>(
       items: allThemes.map((t) => MultiSelectItem(t, t)).toList(),
       initialValue: selectedThemes,
-      title: const Text("Sélectionne des thèmes"),
+      title: const Text("Thématiques"),
       buttonText: const Text("Filtrer par thèmes"),
       buttonIcon: const Icon(Icons.filter_alt),
       searchable: true,

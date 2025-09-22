@@ -37,7 +37,6 @@ class _AgendaCalendarState extends State<AgendaCalendar> {
   @override
   void didUpdateWidget(covariant AgendaCalendar oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // si la liste d'évènements fournie par le parent a changé, on met à jour les events affichés
     if (!listEquals(oldWidget.events, widget.events)) {
       _selectedEvents.value = _getEventsForDay(_selectedDay!);
     }

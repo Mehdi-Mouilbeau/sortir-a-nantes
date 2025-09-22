@@ -10,6 +10,7 @@ import 'package:sortir_a_nantes/models/event.dart';
 import 'package:sortir_a_nantes/screens/parkings/parking_screen.dart';
 import 'package:sortir_a_nantes/screens/velib/naolib_event_screen.dart';
 import 'package:sortir_a_nantes/services/notification_service.dart';
+import 'package:sortir_a_nantes/utils/date_utils.dart';
 
 class EventDetailScreen extends StatefulWidget {
   final Event event;
@@ -77,128 +78,204 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
 
     return Scaffold(
       appBar: AppBar(title: Text(widget.event.name)),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              widget.event.name,
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
-            const SizedBox(height: 8),
-            Text(widget.event.description),
-            const SizedBox(height: 16),
-            SizedBox(
-              height: 250,
-              child: FlutterMap(
-                options: MapOptions(
-                  initialCenter: eventLocation,
-                  initialZoom: 15,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16).copyWith(bottom: 32),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // IMAGE DE L'ÉVÉNEMENT
+              if (widget.event.image.isNotEmpty)
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.network(
+                    widget.event.image,
+                    height: 200,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      height: 200,
+                      color: Colors.grey[300],
+                      child: const Center(
+                          child: Icon(Icons.broken_image, size: 50)),
+                    ),
+                  ),
+                )
+              else
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Container(
+                    height: 200,
+                    width: double.infinity,
+                    color: Colors.grey[200],
+                    child: const Center(
+                      child: Icon(Icons.image_not_supported,
+                          size: 50, color: Colors.grey),
+                    ),
+                  ),
                 ),
-                children: [
-                  TileLayer(
-                    urlTemplate:
-                        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-                    subdomains: const ['a', 'b', 'c'],
-                  ),
-                  MarkerLayer(
-                    markers: [
-                      Marker(
-                        point: eventLocation,
-                        width: 48,
-                        height: 48,
-                        child: const Icon(Icons.location_on,
-                            size: 40, color: Colors.red),
-                      ),
-                    ],
-                  ),
-                ],
+              const SizedBox(height: 16),
+
+              // TITRE
+              Text(
+                widget.event.name,
+                style: Theme.of(context).textTheme.headlineSmall,
               ),
-            ),
-            const SizedBox(height: 16),
-            Center(
-              child: Column(
-                children: [
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ParkingScreen(
-                            eventLat: widget.event.latitude,
-                            eventLon: widget.event.longitude,
-                            eventName: widget.event.name,
+              const SizedBox(height: 8),
+
+              // DESCRIPTION
+              Text(widget.event.description),
+              const SizedBox(height: 16),
+
+              // CARTE
+              SizedBox(
+                height: 250,
+                child: FlutterMap(
+                  options: MapOptions(
+                    initialCenter: eventLocation,
+                    initialZoom: 15,
+                  ),
+                  children: [
+                    TileLayer(
+                      urlTemplate:
+                          "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                      subdomains: const ['a', 'b', 'c'],
+                      userAgentPackageName: 'com.example.sortir_a_nantes',
+                    ),
+                    MarkerLayer(
+                      markers: [
+                        Marker(
+                          point: eventLocation,
+                          width: 48,
+                          height: 48,
+                          child: const Icon(Icons.location_on,
+                              size: 40, color: Colors.red),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // BOUTONS
+              Center(
+                child: Column(
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ParkingScreen(
+                              eventLat: widget.event.latitude,
+                              eventLon: widget.event.longitude,
+                              eventName: widget.event.name,
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                    icon: const Icon(Icons.local_parking),
-                    label: const Text("Voir les parkings disponibles"),
-                  ),
-                  ElevatedButton.icon(
-                    onPressed: () async {
-                      await flutterLocalNotificationsPlugin
-                          .resolvePlatformSpecificImplementation<
-                              IOSFlutterLocalNotificationsPlugin>()
-                          ?.requestPermissions(
-                              alert: true, badge: true, sound: true);
-
-                      await flutterLocalNotificationsPlugin
-                          .resolvePlatformSpecificImplementation<
-                              AndroidFlutterLocalNotificationsPlugin>()
-                          ?.requestNotificationsPermission();
-
-                      await NotificationService().scheduleNotification(
-                        id: int.parse(widget.event.id),
-                        title: widget.event.name,
-                        body: widget.event.description,
-                        scheduledDate: widget.event.date,
-                      );
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text('Notification programmée !')),
-                      );
-                    },
-                    icon: const Icon(Icons.notifications),
-                    label: const Text("Me rappeler de cet événement"),
-                  ),
-                  const SizedBox(height: 12),
-                  ElevatedButton.icon(
-                    onPressed: _togglePlanned,
-                    icon: Icon(isPlanned ? Icons.check : Icons.event_available,
-                        color: Colors.white),
-                    label: Text(isPlanned
-                        ? "Retirer de mon agenda"
-                        : "Ajouter à mon agenda"),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: isPlanned
-                          ? Colors.red
-                          : const Color.fromRGBO(33, 150, 243, 1),
+                        );
+                      },
+                      icon: const Icon(Icons.local_parking),
+                      label: const Text("Voir les parkings disponibles"),
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              NaolibEventScreen(event: widget.event),
-                        ),
-                      );
-                    },
-                    icon:
-                        const Icon(Icons.directions_bike, color: Colors.white),
-                    label: const Text("Trouver un vélo"),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
+                    ElevatedButton.icon(
+                      onPressed: () async {
+                        final DateTime? pickedDate = await showDatePicker(
+                          context: context,
+                          initialDate: widget.event.date,
+                          firstDate: DateTime.now(),
+                          lastDate:
+                              DateTime.now().add(const Duration(days: 365)),
+                        );
+
+                        if (pickedDate == null) return;
+
+                        final TimeOfDay? pickedTime = await showTimePicker(
+                          context: context,
+                          initialTime:
+                              TimeOfDay.fromDateTime(widget.event.date),
+                        );
+
+                        if (pickedTime == null) return;
+
+                        final DateTime scheduledDate = DateTime(
+                          pickedDate.year,
+                          pickedDate.month,
+                          pickedDate.day,
+                          pickedTime.hour,
+                          pickedTime.minute,
+                        );
+
+                        debugPrint(
+                            "Notification programmée pour : ${AppDateUtils.format(scheduledDate)}");
+
+                        await flutterLocalNotificationsPlugin
+                            .resolvePlatformSpecificImplementation<
+                                IOSFlutterLocalNotificationsPlugin>()
+                            ?.requestPermissions(
+                                alert: true, badge: true, sound: true);
+
+                        await flutterLocalNotificationsPlugin
+                            .resolvePlatformSpecificImplementation<
+                                AndroidFlutterLocalNotificationsPlugin>()
+                            ?.requestNotificationsPermission();
+
+                        await NotificationService().scheduleNotification(
+                          id: int.parse(widget.event.id),
+                          title: widget.event.name,
+                          body: widget.event.description,
+                          scheduledDate: scheduledDate,
+                        );
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              "Notification programmée pour le ${AppDateUtils.format(scheduledDate)}",
+                            ),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.notifications),
+                      label: const Text("Me rappeler de cet événement"),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 12),
+                    ElevatedButton.icon(
+                      onPressed: _togglePlanned,
+                      icon: Icon(
+                          isPlanned ? Icons.check : Icons.event_available,
+                          color: Colors.white),
+                      label: Text(isPlanned
+                          ? "Retirer de mon agenda"
+                          : "Ajouter à mon agenda"),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: isPlanned
+                            ? Colors.red
+                            : const Color.fromRGBO(33, 150, 243, 1),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                NaolibEventScreen(event: widget.event),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.directions_bike,
+                          color: Colors.white),
+                      label: const Text("Trouver un vélo"),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
