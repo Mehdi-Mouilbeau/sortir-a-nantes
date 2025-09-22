@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class WeatherService {
-  final String apiKey = 'cf3e4de00c18dc14a478fba35c3a8d6a';
+  final String apiKey = '';
 
   Future<Map<String, dynamic>?> getCurrentWeather(
       double latitude, double longitude) async {
