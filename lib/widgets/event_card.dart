@@ -5,11 +5,7 @@ class EventCard extends StatelessWidget {
   final Event event;
   final VoidCallback? onTap;
 
-  const EventCard({
-    super.key,
-    required this.event,
-    this.onTap,
-  });
+  const EventCard({super.key, required this.event, this.onTap});
 
   String _shortDescription(String text) {
     if (text.length <= 100) return text;
@@ -20,75 +16,72 @@ class EventCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 3,
-      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+      margin: const EdgeInsets.all(8),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
         onTap: onTap,
-        child: Row(
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // IMAGE
-            ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(12),
-                bottomLeft: Radius.circular(12),
-              ),
-              child: event.image.isNotEmpty
-                  ? Image.network(
-                      event.image,
-                      width: 120,
-                      height: 120,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Container(
-                        width: 120,
-                        height: 120,
-                        color: Colors.grey[300],
-                        child: const Icon(Icons.broken_image, size: 40),
+            // IMAGE avec flex
+            Expanded(
+              flex: 2,
+              child: ClipRRect(
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(12),
+                ),
+                child: event.image.isNotEmpty
+                    ? Image.network(
+                        event.image,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          color: Colors.grey[300],
+                          child: const Icon(Icons.broken_image, size: 40),
+                        ),
+                      )
+                    : Container(
+                        color: Colors.grey[200],
+                        child: const Icon(Icons.image, size: 40),
                       ),
-                    )
-                  : Container(
-                      width: 120,
-                      height: 120,
-                      color: Colors.grey[200],
-                      child: const Icon(Icons.image, size: 40),
-                    ),
+              ),
             ),
 
-            // TEXTE
+            // TEXTE avec flex
             Expanded(
+              flex: 3,
               child: Padding(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(8.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       event.name,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        fontSize: 16,
+                        fontSize: 14,
                         fontWeight: FontWeight.bold,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      event.placeName,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                      ),
-                      maxLines: 1,
+                      "${event.city} • ${event.date.year}-${event.date.month.toString().padLeft(2, '0')}-${event.date.day.toString().padLeft(2, '0')}",
+                      style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      _shortDescription(event.description),
-                      style: const TextStyle(fontSize: 14),
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
+                    const SizedBox(height: 6),
+                    Expanded(
+                      child: Text(
+                        _shortDescription(event.description),
+                        style: const TextStyle(fontSize: 12),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
                   ],
                 ),

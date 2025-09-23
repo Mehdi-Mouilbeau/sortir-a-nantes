@@ -26,7 +26,6 @@ class _WeatherWidgetState extends State<WeatherWidget> {
       widget.latitude,
       widget.longitude,
     );
-    debugPrint('Weather raw data: $data');
     setState(() {
       weatherData = data;
       isLoading = false;

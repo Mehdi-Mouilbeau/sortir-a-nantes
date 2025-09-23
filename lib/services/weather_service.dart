@@ -1,8 +1,9 @@
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 class WeatherService {
-  final String apiKey = '';
+  final String apiKey = dotenv.env['API_WEATHER_KEY'] ?? '';
 
   Future<Map<String, dynamic>?> getCurrentWeather(
       double latitude, double longitude) async {

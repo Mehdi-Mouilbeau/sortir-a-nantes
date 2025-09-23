@@ -4,6 +4,8 @@ import 'package:sortir_a_nantes/screens/agenda/agenda_screen.dart';
 import 'package:sortir_a_nantes/screens/events/events_list_screen.dart';
 import 'package:sortir_a_nantes/services/event_service.dart';
 import 'package:sortir_a_nantes/widgets/weather_widget.dart';
+import 'package:sortir_a_nantes/widgets/event_card.dart';
+import 'package:sortir_a_nantes/screens/events/event_detail_screen.dart'; 
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -99,64 +101,29 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(height: 12),
 
-              // GridView des events
+              // GridView des EventCard
               GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
+                  crossAxisCount: 2, 
                   mainAxisSpacing: 12,
                   crossAxisSpacing: 12,
-                  childAspectRatio: 0.75,
+                  childAspectRatio: 0.7, 
                 ),
                 itemCount: displayCount,
                 itemBuilder: (context, index) {
                   final event = events[index];
-                  return Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    elevation: 4,
-                    clipBehavior: Clip.antiAlias,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        event.image.isNotEmpty
-                            ? Image.network(
-                                event.image,
-                                height: 100,
-                                width: double.infinity,
-                                fit: BoxFit.cover,
-                              )
-                            : Container(
-                                height: 100,
-                                color: Colors.grey[300],
-                                child: const Icon(Icons.image_not_supported),
-                              ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                event.name,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                "${event.city} • ${event.date.year}-${event.date.month.toString().padLeft(2, '0')}-${event.date.day.toString().padLeft(2, '0')}",
-                                style: TextStyle(
-                                    color: Colors.grey[600], fontSize: 12),
-                              ),
-                            ],
-                          ),
+                  return EventCard(
+                    event: event,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => EventDetailScreen(event: event),
                         ),
-                      ],
-                    ),
+                      );
+                    },
                   );
                 },
               ),

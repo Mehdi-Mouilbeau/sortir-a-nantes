@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:sortir_a_nantes/screens/home/home_screen.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -10,6 +11,8 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
+
   
   await NotificationService().init();
   await PermissionsService.requestNotificationPermission();
