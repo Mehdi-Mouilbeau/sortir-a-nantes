@@ -1,11 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sortir_a_nantes/main.dart';
 import 'package:sortir_a_nantes/models/event.dart';
 import 'package:sortir_a_nantes/screens/parkings/parking_screen.dart';
 import 'package:sortir_a_nantes/screens/velib/naolib_event_screen.dart';
@@ -180,20 +178,33 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                     ),
                     ElevatedButton.icon(
                       onPressed: () async {
+                        final DateTime now = DateTime.now();
+
+                        // ✅ Sécurisation initialDate (jamais avant aujourd’hui)
+                        final DateTime safeInitialDate =
+                            widget.event.date.isBefore(now)
+                                ? now
+                                : widget.event.date;
+
                         final DateTime? pickedDate = await showDatePicker(
                           context: context,
-                          initialDate: widget.event.date,
-                          firstDate: DateTime.now(),
-                          lastDate:
-                              DateTime.now().add(const Duration(days: 365)),
+                          initialDate: safeInitialDate,
+                          firstDate: now,
+                          lastDate: now.add(const Duration(days: 365)),
                         );
 
                         if (pickedDate == null) return;
 
+                        // ✅ Sécurisation initialTime (jamais avant l’heure actuelle si même jour)
+                        final TimeOfDay initialTime =
+                            pickedDate.isAtSameMomentAs(DateTime(
+                                    now.year, now.month, now.day))
+                                ? TimeOfDay.fromDateTime(now)
+                                : TimeOfDay.fromDateTime(widget.event.date);
+
                         final TimeOfDay? pickedTime = await showTimePicker(
                           context: context,
-                          initialTime:
-                              TimeOfDay.fromDateTime(widget.event.date),
+                          initialTime: initialTime,
                         );
 
                         if (pickedTime == null) return;
@@ -206,19 +217,18 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                           pickedTime.minute,
                         );
 
+                        if (scheduledDate.isBefore(now)) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                  "Impossible de programmer une notification dans le passé."),
+                            ),
+                          );
+                          return;
+                        }
+
                         debugPrint(
                             "Notification programmée pour : ${AppDateUtils.format(scheduledDate)}");
-
-                        await flutterLocalNotificationsPlugin
-                            .resolvePlatformSpecificImplementation<
-                                IOSFlutterLocalNotificationsPlugin>()
-                            ?.requestPermissions(
-                                alert: true, badge: true, sound: true);
-
-                        await flutterLocalNotificationsPlugin
-                            .resolvePlatformSpecificImplementation<
-                                AndroidFlutterLocalNotificationsPlugin>()
-                            ?.requestNotificationsPermission();
 
                         await NotificationService().scheduleNotification(
                           id: int.parse(widget.event.id),

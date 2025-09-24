@@ -1,9 +1,11 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest_all.dart' as tzData;
-import '../main.dart';
 
 class NotificationService {
+  static final FlutterLocalNotificationsPlugin _notificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+
   /// Initialisation de la timezone et du plugin
   Future<void> init() async {
     tzData.initializeTimeZones();
@@ -21,15 +23,36 @@ class NotificationService {
     final InitializationSettings initSettings = InitializationSettings(
       android: androidSettings,
       iOS: iosSettings,
+      macOS: iosSettings,
     );
 
-    // On initialise directement ici pour s'assurer que le plugin est prêt
-    await flutterLocalNotificationsPlugin.initialize(
+    await _notificationsPlugin.initialize(
       initSettings,
-      onDidReceiveNotificationResponse:
-          (NotificationResponse response) async {},
+      onDidReceiveNotificationResponse: (NotificationResponse response) async {
+        // Callback quand on clique sur une notif
+        print("Notification tap: ${response.payload}");
+      },
     );
   }
+
+  Future<void> testNotification() async {
+  await _notificationsPlugin.show(
+    0,
+    'Test immédiat',
+    'Si tu vois ça, les notifs marchent ✅',
+    const NotificationDetails(
+      android: AndroidNotificationDetails(
+        'event_channel',
+        'Rappels événements',
+        channelDescription: 'Notifications pour les événements',
+        importance: Importance.max,
+        priority: Priority.high,
+      ),
+      iOS: DarwinNotificationDetails(),
+    ),
+  );
+}
+
 
   /// Programmation d'une notification à une date et heure spécifiques
   Future<void> scheduleNotification({
@@ -43,10 +66,11 @@ class NotificationService {
         tz.TZDateTime.from(scheduledDate, tz.local);
 
     if (scheduledTZDate.isBefore(now)) {
+      print("⏰ La date est déjà passée, notif annulée");
       return;
     }
 
-    await flutterLocalNotificationsPlugin.zonedSchedule(
+    await _notificationsPlugin.zonedSchedule(
       id,
       title,
       body,

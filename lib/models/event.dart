@@ -61,7 +61,7 @@ class Event {
       address: json['adresse'] ?? '',
       city: json['ville'] ?? '',
       postalCode: json['code_postal']?.toString() ?? '',
-      website: json['lieu_siteweb'] ?? json['url_site'] ?? null,
+      website: json['lieu_siteweb'] ?? json['url_site'],
       isFree: (json['gratuit']?.toString().toLowerCase() ?? 'non') == 'oui',
       latitude: ((json['latitude'] ??
                   (json['location_latlong'] != null

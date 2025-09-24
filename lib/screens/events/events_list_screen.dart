@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sortir_a_nantes/widgets/event_card_list.dart';
 import '../../models/event.dart';
 import './event_detail_screen.dart';
 import '../../services/event_service.dart';
@@ -80,9 +81,11 @@ class _EventListScreenState extends State<EventListScreen> {
       case DateFilter.today:
         return DateTime(now.year, now.month, now.day);
       case DateFilter.next3Days:
-        return DateTime(now.year, now.month, now.day).add(const Duration(days: 3));
+        return DateTime(now.year, now.month, now.day)
+            .add(const Duration(days: 3));
       case DateFilter.thisWeek:
-        return DateTime(now.year, now.month, now.day).add(const Duration(days: 7));
+        return DateTime(now.year, now.month, now.day)
+            .add(const Duration(days: 7));
       case DateFilter.custom:
         return customRange?.end;
       default:
@@ -104,52 +107,71 @@ class _EventListScreenState extends State<EventListScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text("Évènements")),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Dropdown pour sélectionner la ville
-          CityDropdown(
-            cities: cities,
-            selectedCity: selectedCity,
-            onChanged: (value) {
-              setState(() {
-                selectedCity = value;
-              });
-            },
-          ),
-
-          // Dropdown pour filtrer par date
-          DateFilterDropdown(
-            selectedDateFilter: selectedDateFilter,
-            onChanged: (value) async {
-              if (value == DateFilter.custom) {
-                final range = await showDateRangePicker(
-                  context: context,
-                  firstDate: DateTime.now().subtract(const Duration(days: 365)),
-                  lastDate: DateTime.now().add(const Duration(days: 365)),
-                );
-                if (range != null) {
-                  setState(() {
-                    customRange = range;
-                    selectedDateFilter = value;
-                  });
-                }
-              } else {
-                setState(() {
-                  selectedDateFilter = value;
-                  customRange = null;
-                });
-              }
-            },
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Wrap(
+              spacing: 8, // espace horizontal
+              runSpacing: 8, // espace vertical si ça passe à la ligne
+              children: [
+                SizedBox(
+                  width: MediaQuery.of(context).size.width / 2 -
+                      16, // moitié de l’écran
+                  child: CityDropdown(
+                    cities: cities,
+                    selectedCity: selectedCity,
+                    onChanged: (value) {
+                      setState(() {
+                        selectedCity = value;
+                      });
+                    },
+                  ),
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width / 2 - 16,
+                  child: DateFilterDropdown(
+                    selectedDateFilter: selectedDateFilter,
+                    onChanged: (value) async {
+                      if (value == DateFilter.custom) {
+                        final range = await showDateRangePicker(
+                          context: context,
+                          firstDate: DateTime.now()
+                              .subtract(const Duration(days: 365)),
+                          lastDate:
+                              DateTime.now().add(const Duration(days: 365)),
+                        );
+                        if (range != null) {
+                          setState(() {
+                            customRange = range;
+                            selectedDateFilter = value;
+                          });
+                        }
+                      } else {
+                        setState(() {
+                          selectedDateFilter = value;
+                          customRange = null;
+                        });
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ),
           ),
 
           if (allThemes.isNotEmpty)
-            ThemeDropdown(
-              allThemes: allThemes,
-              selectedThemes: selectedThemes,
-              onChanged: (values) {
-                setState(() {
-                  selectedThemes = values;
-                });
-              },
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: ThemeDropdown(
+                allThemes: allThemes,
+                selectedThemes: selectedThemes,
+                onChanged: (values) {
+                  setState(() {
+                    selectedThemes = values;
+                  });
+                },
+              ),
             ),
 
           // Liste des événements
@@ -166,9 +188,11 @@ class _EventListScreenState extends State<EventListScreen> {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const Center(child: CircularProgressIndicator());
                       } else if (snapshot.hasError) {
-                        return Center(child: Text("Erreur : ${snapshot.error}"));
+                        return Center(
+                            child: Text("Erreur : ${snapshot.error}"));
                       } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                        return const Center(child: Text("Aucun évènement trouvé"));
+                        return const Center(
+                            child: Text("Aucun évènement trouvé"));
                       }
 
                       final events = snapshot.data!;
@@ -176,9 +200,8 @@ class _EventListScreenState extends State<EventListScreen> {
                         itemCount: events.length,
                         itemBuilder: (context, index) {
                           final event = events[index];
-                          return ListTile(
-                            title: Text(event.name),
-                            subtitle: Text("${event.placeName} - ${event.city}"),
+                          return EventCardList(
+                            event: event,
                             onTap: () {
                               Navigator.push(
                                 context,
@@ -194,7 +217,8 @@ class _EventListScreenState extends State<EventListScreen> {
                     },
                   )
                 : const Center(
-                    child: Text("Choisis une ville, une date ou un thème pour afficher les évènements"),
+                    child: Text(
+                        "Choisis une ville, une date ou un thème pour afficher les évènements"),
                   ),
           ),
         ],

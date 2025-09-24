@@ -3,9 +3,10 @@ import 'package:sortir_a_nantes/models/event.dart';
 import 'package:sortir_a_nantes/screens/agenda/agenda_screen.dart';
 import 'package:sortir_a_nantes/screens/events/events_list_screen.dart';
 import 'package:sortir_a_nantes/services/event_service.dart';
+import 'package:sortir_a_nantes/services/notification_service.dart';
 import 'package:sortir_a_nantes/widgets/weather_widget.dart';
 import 'package:sortir_a_nantes/widgets/event_card.dart';
-import 'package:sortir_a_nantes/screens/events/event_detail_screen.dart'; 
+import 'package:sortir_a_nantes/screens/events/event_detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -21,12 +22,19 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _eventsFuture = EventService().fetchEvents(limit: 20);
+    final now = DateTime.now();
+    final nextWeek = now.add(const Duration(days: 7));
+
+    _eventsFuture = EventService().fetchEvents(
+      startDate: now,
+      endDate: nextWeek,
+      limit: 20,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final List<Widget> _pages = [
+    final List<Widget> pages = [
       _buildDiscoverPage(),
       const EventListScreen(),
       const AgendaScreen(),
@@ -34,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(title: const Text("Sortir à Nantes")),
-      body: _pages[_currentIndex],
+      body: pages[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         selectedItemColor: Colors.purple,
@@ -100,16 +108,21 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
               const SizedBox(height: 12),
+              ElevatedButton(
+                onPressed: () async {
+                  await NotificationService().testNotification();
+                },
+                child: const Text("Tester une notif immédiate"),
+              ),
 
-              // GridView des EventCard
               GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2, 
+                  crossAxisCount: 2,
                   mainAxisSpacing: 12,
                   crossAxisSpacing: 12,
-                  childAspectRatio: 0.7, 
+                  childAspectRatio: 0.7,
                 ),
                 itemCount: displayCount,
                 itemBuilder: (context, index) {

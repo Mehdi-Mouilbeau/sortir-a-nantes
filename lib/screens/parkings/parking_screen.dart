@@ -3,7 +3,9 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:sortir_a_nantes/models/parking.dart';
 import 'package:sortir_a_nantes/services/parking_service.dart';
+import 'package:sortir_a_nantes/utils/maps_redirection.dart';
 import 'package:sortir_a_nantes/utils/parking_utils.dart';
+import 'package:geolocator/geolocator.dart';
 
 class ParkingScreen extends StatefulWidget {
   final double eventLat;
@@ -68,7 +70,8 @@ class _ParkingScreenState extends State<ParkingScreen> {
                   return const Center(child: CircularProgressIndicator());
                 }
                 if (snapshot.hasError) {
-                  return Center(child: Text("Erreur parkings : ${snapshot.error}"));
+                  return Center(
+                      child: Text("Erreur parkings : ${snapshot.error}"));
                 }
 
                 final parkings = snapshot.data ?? [];
@@ -78,9 +81,11 @@ class _ParkingScreenState extends State<ParkingScreen> {
                     point: eventLocation,
                     width: 48,
                     height: 48,
-                    child: const Icon(Icons.location_on, size: 40, color: Colors.red),
+                    child: const Icon(Icons.location_on,
+                        size: 40, color: Colors.red),
                   ),
                 ];
+
                 for (var p in parkings) {
                   markers.add(
                     Marker(
@@ -89,16 +94,19 @@ class _ParkingScreenState extends State<ParkingScreen> {
                       height: 60,
                       child: Column(
                         children: [
-                          const Icon(Icons.local_parking, size: 28, color: Colors.blue),
+                          const Icon(Icons.local_parking,
+                              size: 28, color: Colors.blue),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
                               color: Colors.white70,
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
                               "${p.available}",
-                              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                              style: const TextStyle(
+                                  fontSize: 12, fontWeight: FontWeight.bold),
                             ),
                           ),
                         ],
@@ -115,7 +123,8 @@ class _ParkingScreenState extends State<ParkingScreen> {
                   ),
                   children: [
                     TileLayer(
-                      urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+                      urlTemplate:
+                          "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
                       subdomains: const ['a', 'b', 'c'],
                       userAgentPackageName: 'com.example.sortir_a_nantes',
                     ),
@@ -128,6 +137,7 @@ class _ParkingScreenState extends State<ParkingScreen> {
 
           const SizedBox(height: 8),
 
+          // Liste des parkings
           Expanded(
             child: FutureBuilder<List<Parking>>(
               future: _nearbyParkingsFuture,
@@ -136,12 +146,15 @@ class _ParkingScreenState extends State<ParkingScreen> {
                   return const Center(child: CircularProgressIndicator());
                 }
                 if (snapshot.hasError) {
-                  return Center(child: Text("Erreur parkings : ${snapshot.error}"));
+                  return Center(
+                      child: Text("Erreur parkings : ${snapshot.error}"));
                 }
 
                 final parkings = snapshot.data ?? [];
                 if (parkings.isEmpty) {
-                  return const Center(child: Text("Aucun parking disponible dans un rayon de 1 km."));
+                  return const Center(
+                      child: Text(
+                          "Aucun parking disponible dans un rayon de 1 km."));
                 }
 
                 return ListView.separated(
@@ -150,12 +163,25 @@ class _ParkingScreenState extends State<ParkingScreen> {
                   itemBuilder: (context, index) {
                     final p = parkings[index];
                     return ListTile(
-                      leading: const Icon(Icons.local_parking, color: Colors.blue),
+                      leading:
+                          const Icon(Icons.local_parking, color: Colors.blue),
                       title: Text(p.name.isNotEmpty ? p.name : p.address),
                       subtitle: Text(p.address),
-                      trailing: Text(
-                        "${p.available} libres",
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            "${p.available} libres",
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.directions),
+                            onPressed: () async {
+                              // Ouvrir Google Maps depuis la position actuelle
+                              await openGoogleMaps(p.lat, p.lon);
+                            },
+                          ),
+                        ],
                       ),
                       onTap: () => _centerMapOn(LatLng(p.lat, p.lon)),
                     );
