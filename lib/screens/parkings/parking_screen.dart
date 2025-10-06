@@ -5,7 +5,6 @@ import 'package:sortir_a_nantes/models/parking.dart';
 import 'package:sortir_a_nantes/services/parking_service.dart';
 import 'package:sortir_a_nantes/utils/maps_redirection.dart';
 import 'package:sortir_a_nantes/utils/parking_utils.dart';
-import 'package:geolocator/geolocator.dart';
 
 class ParkingScreen extends StatefulWidget {
   final double eventLat;
