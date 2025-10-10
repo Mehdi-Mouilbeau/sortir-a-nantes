@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sortir_a_nantes/screens/events/events_list_screen.dart';
+import 'package:sortir_a_nantes/screens/parkings/find_parking_screen.dart';
+import 'package:sortir_a_nantes/screens/velib/find_bike_station.dart';
 
 class DiscoverScreen extends StatelessWidget {
   const DiscoverScreen({super.key});
@@ -31,16 +33,16 @@ class DiscoverScreen extends StatelessWidget {
         color: Colors.green,
         onTap: () => Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => const EventListScreen()),
+          MaterialPageRoute(builder: (_) => const FindParkingScreen()),
         ),
       ),
       _MenuItem(
-        title: "Météo",
+        title: "Bikes",
         icon: Icons.wb_sunny,
         color: Colors.orange,
         onTap: () => Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => const EventListScreen()),
+          MaterialPageRoute(builder: (_) => const FindBikeStationScreen()),
         ),
       ),
     ];
@@ -52,7 +54,7 @@ class DiscoverScreen extends StatelessWidget {
         child: GridView.builder(
           itemCount: menuItems.length,
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2, // 2 colonnes
+            crossAxisCount: 2,
             crossAxisSpacing: 16,
             mainAxisSpacing: 16,
             childAspectRatio: 1,

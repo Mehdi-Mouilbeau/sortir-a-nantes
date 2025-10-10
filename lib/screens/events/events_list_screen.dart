@@ -112,12 +112,12 @@ class _EventListScreenState extends State<EventListScreen> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Wrap(
-              spacing: 8, // espace horizontal
-              runSpacing: 8, // espace vertical si ça passe à la ligne
+              spacing: 8,
+              runSpacing: 8, 
               children: [
                 SizedBox(
                   width: MediaQuery.of(context).size.width / 2 -
-                      16, // moitié de l’écran
+                      16, 
                   child: CityDropdown(
                     cities: cities,
                     selectedCity: selectedCity,

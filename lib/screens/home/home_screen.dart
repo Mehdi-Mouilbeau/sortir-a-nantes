@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:sortir_a_nantes/models/event.dart';
-import 'package:sortir_a_nantes/screens/agenda/agenda_screen.dart';
-import 'package:sortir_a_nantes/screens/discorver/discover.dart';
-import 'package:sortir_a_nantes/screens/events/events_list_screen.dart';
 import 'package:sortir_a_nantes/services/event_service.dart';
 import 'package:sortir_a_nantes/services/notification_service.dart';
 import 'package:sortir_a_nantes/widgets/weather_widget.dart';
@@ -18,7 +15,6 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late Future<List<Event>> _eventsFuture;
-  int _currentIndex = 0;
 
   @override
   void initState() {
@@ -35,48 +31,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final List<Widget> pages = [
-      _buildDiscoverPage(),
-      const EventListScreen(),
-      const DiscoverScreen(),
-      const AgendaScreen(),
-    ];
-
-    return Scaffold(
-      appBar: AppBar(title: const Text("Sortir à Nantes")),
-      body: pages[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        selectedItemColor: Colors.purple,
-        unselectedItemColor: Colors.grey,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.explore),
-            label: "Découvrir",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.event),
-            label: "Événements",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.event),
-            label: "Rechercher",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.event_note),
-            label: "Agenda",
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDiscoverPage() {
     return FutureBuilder<List<Event>>(
       future: _eventsFuture,
       builder: (context, snapshot) {
@@ -96,7 +50,6 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Section titre + météo
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -107,10 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  WeatherWidget(
-                    latitude: 47.2184,
-                    longitude: -1.5536,
-                  ),
+                  WeatherWidget(latitude: 47.2184, longitude: -1.5536),
                 ],
               ),
               const SizedBox(height: 12),
@@ -120,7 +70,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
                 child: const Text("Tester une notif immédiate"),
               ),
-
               GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),

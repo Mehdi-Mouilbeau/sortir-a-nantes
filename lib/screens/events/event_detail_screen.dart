@@ -180,7 +180,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                       onPressed: () async {
                         final DateTime now = DateTime.now();
 
-                        // ✅ Sécurisation initialDate (jamais avant aujourd’hui)
+                        // jamais avant aujourd’hui
                         final DateTime safeInitialDate =
                             widget.event.date.isBefore(now)
                                 ? now
@@ -195,7 +195,7 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
 
                         if (pickedDate == null) return;
 
-                        // ✅ Sécurisation initialTime (jamais avant l’heure actuelle si même jour)
+                        // jamais avant l’heure actuelle si même jour
                         final TimeOfDay initialTime =
                             pickedDate.isAtSameMomentAs(DateTime(
                                     now.year, now.month, now.day))

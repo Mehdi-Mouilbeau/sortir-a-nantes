@@ -32,12 +32,9 @@ class _AgendaScreenState extends State<AgendaScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Mon agenda")),
-      body: AgendaCalendar(
-        events: plannedEvents,
-        onEventChanged: _loadPlannedEvents,
-      ),
+    return AgendaCalendar(
+      events: plannedEvents,
+      onEventChanged: _loadPlannedEvents,
     );
   }
 }

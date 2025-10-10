@@ -80,7 +80,7 @@ class Event {
     );
   }
 
-  /// Convertit l'objet en Map compatible avec `fromJson` (pour stockage local)
+  /// Convertit l'objet en Map compatible avec `fromJson` (pour stockage local) à revoir si je garde ceci
   Map<String, dynamic> toJson() {
     return {
       'id_manif': id,
