@@ -61,4 +61,29 @@ class GeocodingService {
     }
     return null;
   }
+
+   static Future<LatLng?> getCoordinates(String city) async {
+    final url = Uri.parse(
+      "https://nominatim.openstreetmap.org/search"
+      "?format=json"
+      "&q=$city"
+      "&limit=1"
+      "&countrycodes=fr"
+      "&viewbox=$_viewBox"
+      "&bounded=1",
+    );
+
+    final response = await http.get(url, headers: _headers);
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      if (data.isNotEmpty) {
+        return LatLng(
+          double.parse(data[0]['lat']),
+          double.parse(data[0]['lon']),
+        );
+      }
+    }
+    return null;
+  }
 }

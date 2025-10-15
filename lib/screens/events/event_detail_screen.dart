@@ -281,6 +281,20 @@ class _EventDetailScreenState extends State<EventDetailScreen> {
                         backgroundColor: Colors.green,
                       ),
                     ),
+                    const SizedBox(height: 12),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        // Ajoute l'évènement au dashboard
+                        Navigator.pop(context, {
+                          'event': widget.event.toJson(),
+                        });
+                      },
+                      icon: Icon(Icons.dashboard_customize),
+                      label: Text("Ajouter cet évènement au dashboard"),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.purple,
+                      ),
+                    ),
                   ],
                 ),
               ),

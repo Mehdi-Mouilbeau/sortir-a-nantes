@@ -14,14 +14,16 @@ pluginManagement {
         mavenCentral()
         gradlePluginPortal()
     }
+
+    plugins {
+        id 'org.jetbrains.kotlin.jvm' version '2.2.0'
+    }
 }
 
 plugins {
     id "dev.flutter.flutter-plugin-loader" version "1.0.0"
-    // ✅ Mets à jour AGP
-    id "com.android.application" version "8.6.0" apply false
-    // ✅ Mets à jour Kotlin pour être compatible avec AGP 8.3+
-    id "org.jetbrains.kotlin.android" version "1.9.23" apply false
+    id "com.android.application" version "8.13.0" apply false
+    id "org.jetbrains.kotlin.android" version "2.2.0" apply false
 }
 
 include ":app"

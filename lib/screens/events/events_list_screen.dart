@@ -202,14 +202,17 @@ class _EventListScreenState extends State<EventListScreen> {
                           final event = events[index];
                           return EventCardList(
                             event: event,
-                            onTap: () {
-                              Navigator.push(
+                            onTap: () async {
+                              final result = await Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) =>
                                       EventDetailScreen(event: event),
                                 ),
                               );
+                              if (result != null && result['event'] != null) {
+                                Navigator.pop(context, result); // Retourne l'événement au dashboard
+                              }
                             },
                           );
                         },
