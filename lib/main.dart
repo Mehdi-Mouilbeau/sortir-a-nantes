@@ -3,7 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:sortir_a_nantes/services/notification_service.dart';
 import 'package:sortir_a_nantes/services/permissions_service.dart';
-import 'package:sortir_a_nantes/widgets/main_screen.dart';
+import 'package:sortir_a_nantes/main_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

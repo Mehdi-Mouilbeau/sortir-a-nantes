@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:sortir_a_nantes/screens/dashboard/dashboard_screen.dart';
 import 'package:sortir_a_nantes/screens/events/events_list_screen.dart';
 import 'package:sortir_a_nantes/screens/parkings/find_parking_screen.dart';
 import 'package:sortir_a_nantes/screens/velib/find_bike_station.dart';
@@ -15,7 +16,7 @@ class DiscoverScreen extends StatelessWidget {
         color: Colors.purple,
         onTap: () => Navigator.push(
           context,
-          MaterialPageRoute(builder: (_) => const EventListScreen()),
+          MaterialPageRoute(builder: (_) => const DashboardScreen()),
         ),
       ),
       _MenuItem(

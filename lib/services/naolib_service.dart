@@ -14,7 +14,7 @@ class NaolibService {
       final List<dynamic> results = data['results'];
 
       final stations = results.map((e) {
-        final stationJson = e; // chaque élément est déjà la station
+        final stationJson = e;
         return NaolibStation.fromJson(stationJson);
       }).toList();
 

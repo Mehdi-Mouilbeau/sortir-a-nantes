@@ -1,12 +1,12 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:sortir_a_nantes/models/parking.dart';
 import 'package:sortir_a_nantes/services/parking_service.dart';
+import 'package:sortir_a_nantes/services/geocoding_service.dart';
 import 'package:sortir_a_nantes/utils/parking_utils.dart';
-import 'package:sortir_a_nantes/utils/maps_redirection.dart';
+import 'package:sortir_a_nantes/widgets/naoparking/parking_list.dart';
+import 'package:sortir_a_nantes/widgets/naoparking/parking_map.dart';
 
 class FindParkingScreen extends StatefulWidget {
   const FindParkingScreen({super.key});
@@ -24,27 +24,6 @@ class _FindParkingScreenState extends State<FindParkingScreen> {
   List<Map<String, dynamic>> _suggestions = [];
   bool _isSearching = false;
 
-  /// adresse précise
-  Future<LatLng?> _geocodeAddress(String address) async {
-    final url = Uri.parse(
-        "https://nominatim.openstreetmap.org/search?format=json&q=$address&limit=1&countrycodes=fr");
-
-    final response = await http.get(url, headers: {
-      "User-Agent": "sortir_a_nantes_app/1.0 (contact@example.com)"
-    });
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body);
-      if (data.isNotEmpty) {
-        final lat = double.parse(data[0]['lat']);
-        final lon = double.parse(data[0]['lon']);
-        return LatLng(lat, lon);
-      }
-    }
-    return null;
-  }
-
-  /// Suggestions d’adresses (auto-complétion)
   Future<void> _fetchSuggestions(String query) async {
     if (query.length < 3) {
       setState(() => _suggestions = []);
@@ -52,32 +31,20 @@ class _FindParkingScreenState extends State<FindParkingScreen> {
     }
 
     setState(() => _isSearching = true);
-
-    final url = Uri.parse(
-        "https://nominatim.openstreetmap.org/search?format=json&q=$query&addressdetails=1&limit=5&countrycodes=fr");
-    final response = await http.get(url, headers: {
-      "User-Agent": "sortir_a_nantes_app/1.0 (contact@example.com)"
+    final results = await GeocodingService.fetchSuggestions(query);
+    setState(() {
+      _suggestions = results;
+      _isSearching = false;
     });
-
-    if (response.statusCode == 200) {
-      final data = json.decode(response.body) as List;
-      setState(() {
-        _suggestions = data
-            .map((item) => {
-                  "display_name": item["display_name"],
-                  "lat": double.parse(item["lat"]),
-                  "lon": double.parse(item["lon"]),
-                })
-            .toList();
-      });
-    } else {
-      setState(() => _suggestions = []);
-    }
-
-    setState(() => _isSearching = false);
   }
 
-  /// Charge les parkings à proximité (500 m)
+  Future<void> _searchByAddress(String address) async {
+    final coords = await GeocodingService.geocodeAddress(address);
+    if (coords != null) {
+      _searchAddress(coords, address);
+    }
+  }
+
   Future<List<Parking>> _loadNearbyParkings(LatLng pos) async {
     try {
       final all = await ParkingService().fetchParkings();
@@ -94,7 +61,7 @@ class _FindParkingScreenState extends State<FindParkingScreen> {
   }
 
   void _searchAddress(LatLng coords, String label) {
-    FocusScope.of(context).unfocus(); // ferme le clavier
+    FocusScope.of(context).unfocus();
     _addressController.text = label;
     setState(() {
       _searchedLocation = coords;
@@ -110,7 +77,7 @@ class _FindParkingScreenState extends State<FindParkingScreen> {
       appBar: AppBar(title: const Text("Trouver un parking")),
       body: Column(
         children: [
-          //  Barre de recherche
+          // Barre de recherche
           Padding(
             padding: const EdgeInsets.all(12),
             child: Column(
@@ -128,15 +95,9 @@ class _FindParkingScreenState extends State<FindParkingScreen> {
                         : const Icon(Icons.search),
                   ),
                   onChanged: _fetchSuggestions,
-                  onSubmitted: (value) async {
-                    final coords = await _geocodeAddress(value);
-                    if (coords != null) {
-                      _searchAddress(coords, value);
-                    }
-                  },
+                  onSubmitted: _searchByAddress,
                 ),
 
-                //  Liste des suggestions
                 if (_suggestions.isNotEmpty)
                   Container(
                     margin: const EdgeInsets.only(top: 6),
@@ -156,21 +117,18 @@ class _FindParkingScreenState extends State<FindParkingScreen> {
                       itemCount: _suggestions.length,
                       separatorBuilder: (_, __) => const Divider(height: 1),
                       itemBuilder: (context, index) {
-                        final suggestion = _suggestions[index];
+                        final s = _suggestions[index];
                         return ListTile(
                           leading: const Icon(Icons.place, color: Colors.blue),
                           title: Text(
-                            suggestion["display_name"],
+                            s["display_name"],
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
-                          onTap: () {
-                            final coords = LatLng(
-                              suggestion["lat"],
-                              suggestion["lon"],
-                            );
-                            _searchAddress(coords, suggestion["display_name"]);
-                          },
+                          onTap: () => _searchAddress(
+                            LatLng(s["lat"], s["lon"]),
+                            s["display_name"],
+                          ),
                         );
                       },
                     ),
@@ -179,7 +137,7 @@ class _FindParkingScreenState extends State<FindParkingScreen> {
             ),
           ),
 
-          // Si aucune adresse saisie encore
+          // Résultats
           if (_searchedLocation == null)
             const Expanded(
               child: Center(
@@ -190,7 +148,6 @@ class _FindParkingScreenState extends State<FindParkingScreen> {
               ),
             )
           else
-            // Résultats (carte + liste)
             Expanded(
               child: FutureBuilder<List<Parking>>(
                 future: _nearbyParkingsFuture,
@@ -199,113 +156,24 @@ class _FindParkingScreenState extends State<FindParkingScreen> {
                     return const Center(child: CircularProgressIndicator());
                   }
                   if (snapshot.hasError) {
-                    return Center(
-                        child: Text("Erreur : ${snapshot.error.toString()}"));
+                    return Center(child: Text("Erreur : ${snapshot.error}"));
                   }
 
                   final parkings = snapshot.data ?? [];
-                  final markers = <Marker>[
-                    Marker(
-                      point: _searchedLocation!,
-                      width: 48,
-                      height: 48,
-                      child: const Icon(Icons.location_on,
-                          size: 40, color: Colors.red),
-                    ),
-                    ...parkings.map(
-                      (p) => Marker(
-                        point: LatLng(p.lat, p.lon),
-                        width: 80,
-                        height: 60,
-                        child: Column(
-                          children: [
-                            const Icon(Icons.local_parking,
-                                size: 28, color: Colors.blue),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 6, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: Colors.white70,
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Text(
-                                "${p.available}",
-                                style: const TextStyle(
-                                    fontSize: 12, fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ];
 
                   return Column(
                     children: [
-                      SizedBox(
-                        height: 300,
-                        child: FlutterMap(
-                          mapController: _mapController,
-                          options: MapOptions(
-                            initialCenter: _searchedLocation!,
-                            initialZoom: 15,
-                          ),
-                          children: [
-                            TileLayer(
-                              urlTemplate:
-                                  "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-                              subdomains: const ['a', 'b', 'c'],
-                            ),
-                            MarkerLayer(markers: markers),
-                          ],
-                        ),
+                      ParkingMap(
+                        mapController: _mapController,
+                        center: _searchedLocation!,
+                        parkings: parkings,
                       ),
                       const SizedBox(height: 8),
                       Expanded(
-                        child: parkings.isEmpty
-                            ? const Center(
-                                child: Text(
-                                  "Aucun parking disponible à 500 m.",
-                                  style: TextStyle(fontSize: 16),
-                                ),
-                              )
-                            : ListView.separated(
-                                itemCount: parkings.length,
-                                separatorBuilder: (_, __) =>
-                                    const Divider(height: 1),
-                                itemBuilder: (context, index) {
-                                  final p = parkings[index];
-                                  return ListTile(
-                                    leading: const Icon(Icons.local_parking,
-                                        color: Colors.blue),
-                                    title: Text(
-                                        p.name.isNotEmpty
-                                            ? p.name
-                                            : "Parking sans nom",
-                                        style: const TextStyle(
-                                            fontWeight: FontWeight.bold)),
-                                    subtitle: Text(p.address),
-                                    trailing: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                          "${p.available} libres",
-                                          style: const TextStyle(
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        IconButton(
-                                          icon: const Icon(
-                                              Icons.directions_outlined),
-                                          onPressed: () =>
-                                              openGoogleMaps(p.lat, p.lon),
-                                        ),
-                                      ],
-                                    ),
-                                    onTap: () => _mapController.move(
-                                        LatLng(p.lat, p.lon), 17),
-                                  );
-                                },
-                              ),
+                        child: ParkingList(
+                          parkings: parkings,
+                          mapController: _mapController,
+                        ),
                       ),
                     ],
                   );
