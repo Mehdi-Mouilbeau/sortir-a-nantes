@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sortir_a_nantes/services/weather_service.dart';
+import 'package:sortir_a_nantes/services/weather/weather_service.dart';
 
 class WeatherWidget extends StatefulWidget {
   final double latitude;

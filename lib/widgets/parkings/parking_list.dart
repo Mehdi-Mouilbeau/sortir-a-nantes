@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:sortir_a_nantes/models/parking.dart';
+import 'package:sortir_a_nantes/models/parking/parking.dart';
 import 'package:sortir_a_nantes/utils/maps_redirection.dart';
 
 class ParkingList extends StatelessWidget {

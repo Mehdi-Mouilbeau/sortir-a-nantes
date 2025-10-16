@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:sortir_a_nantes/models/event.dart';
+import 'package:sortir_a_nantes/models/event/event.dart';
 import 'package:sortir_a_nantes/screens/events/event_detail_screen.dart';
 
 class AgendaCalendar extends StatefulWidget {

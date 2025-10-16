@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
-import '../../models/naolib_station.dart';
-import '../../models/event.dart';
-import '../../services/naolib_service.dart';
+import '../../models/bikestation/naolib_station.dart';
+import '../../models/event/event.dart';
+import '../../services/bikestation/naolib_service.dart';
 
 class NaolibEventScreen extends StatefulWidget {
   final Event event;

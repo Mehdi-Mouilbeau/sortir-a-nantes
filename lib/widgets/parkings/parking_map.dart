@@ -1,37 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:sortir_a_nantes/models/naolib_station.dart';
+import 'package:sortir_a_nantes/models/parking/parking.dart';
 
-class StationsMap extends StatelessWidget {
-  final LatLng searchedLocation;
-  final List<NaolibStation> stations;
+class ParkingMap extends StatelessWidget {
   final MapController mapController;
+  final LatLng center;
+  final List<Parking> parkings;
 
-  const StationsMap({
+  const ParkingMap({
     super.key,
-    required this.searchedLocation,
-    required this.stations,
     required this.mapController,
+    required this.center,
+    required this.parkings,
   });
 
   @override
   Widget build(BuildContext context) {
     final markers = <Marker>[
       Marker(
-        point: searchedLocation,
+        point: center,
         width: 48,
         height: 48,
         child: const Icon(Icons.location_on, size: 40, color: Colors.red),
       ),
-      ...stations.map(
-        (s) => Marker(
-          point: LatLng(s.lat, s.lon),
+      ...parkings.map(
+        (p) => Marker(
+          point: LatLng(p.lat, p.lon),
           width: 80,
           height: 60,
           child: Column(
             children: [
-              const Icon(Icons.pedal_bike, size: 28, color: Colors.orange),
+              const Icon(Icons.local_parking, size: 28, color: Colors.blue),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
@@ -39,8 +39,9 @@ class StationsMap extends StatelessWidget {
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
-                  "${s.availableBikes}",
-                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                  "${p.available}",
+                  style: const TextStyle(
+                      fontSize: 12, fontWeight: FontWeight.bold),
                 ),
               ),
             ],
@@ -53,13 +54,11 @@ class StationsMap extends StatelessWidget {
       height: 300,
       child: FlutterMap(
         mapController: mapController,
-        options: MapOptions(
-          initialCenter: searchedLocation,
-          initialZoom: 15,
-        ),
+        options: MapOptions(initialCenter: center, initialZoom: 15),
         children: [
           TileLayer(
             urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+            subdomains: const ['a', 'b', 'c'],
           ),
           MarkerLayer(markers: markers),
         ],

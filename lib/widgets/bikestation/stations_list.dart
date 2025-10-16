@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sortir_a_nantes/models/naolib_station.dart';
+import 'package:sortir_a_nantes/models/bikestation/naolib_station.dart';
 import 'package:sortir_a_nantes/utils/maps_redirection.dart';
 
 class StationsList extends StatelessWidget {

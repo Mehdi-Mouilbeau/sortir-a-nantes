@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:sortir_a_nantes/models/parking.dart';
-import 'package:sortir_a_nantes/services/parking_service.dart';
+import 'package:sortir_a_nantes/models/parking/parking.dart';
+import 'package:sortir_a_nantes/services/parkings/parking_service.dart';
 import 'package:sortir_a_nantes/services/geocoding_service.dart';
 import 'package:sortir_a_nantes/utils/parking_utils.dart';
-import 'package:sortir_a_nantes/widgets/naoparking/parking_list.dart';
-import 'package:sortir_a_nantes/widgets/naoparking/parking_map.dart';
+import 'package:sortir_a_nantes/widgets/parkings/parking_list.dart';
+import 'package:sortir_a_nantes/widgets/parkings/parking_map.dart';
 
 class FindParkingScreen extends StatefulWidget {
   const FindParkingScreen({super.key});

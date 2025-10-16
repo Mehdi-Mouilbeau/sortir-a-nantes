@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../models/event.dart';
+import '../../models/event/event.dart';
 
 class EventService {
   final String baseUrl =

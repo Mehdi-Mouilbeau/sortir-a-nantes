@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sortir_a_nantes/models/event.dart';
+import 'package:sortir_a_nantes/models/event/event.dart';
 import 'package:sortir_a_nantes/widgets/agenda_calendar.dart';
 
 class AgendaScreen extends StatefulWidget {

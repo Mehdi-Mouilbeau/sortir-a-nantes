@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:sortir_a_nantes/models/event.dart';
-import 'package:sortir_a_nantes/services/event_service.dart';
+import 'package:sortir_a_nantes/models/event/event.dart';
+import 'package:sortir_a_nantes/services/events/event_service.dart';
 import 'package:sortir_a_nantes/services/notification_service.dart';
-import 'package:sortir_a_nantes/widgets/weather_widget.dart';
-import 'package:sortir_a_nantes/widgets/event_card.dart';
+import 'package:sortir_a_nantes/widgets/weather/weather_widget.dart';
+import 'package:sortir_a_nantes/widgets/events/event_card.dart';
 import 'package:sortir_a_nantes/screens/events/event_detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {

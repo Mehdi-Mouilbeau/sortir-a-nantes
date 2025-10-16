@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../models/naolib_station.dart';
+import '../../models/bikestation/naolib_station.dart';
 
 class NaolibService {
   Future<List<NaolibStation>> fetchStations() async {

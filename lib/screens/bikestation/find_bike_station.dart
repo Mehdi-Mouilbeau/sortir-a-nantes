@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:sortir_a_nantes/models/naolib_station.dart';
-import 'package:sortir_a_nantes/services/naolib_service.dart';
-import 'package:sortir_a_nantes/widgets/naobike/address_search_bar.dart';
-import 'package:sortir_a_nantes/widgets/naobike/stations_list.dart';
-import 'package:sortir_a_nantes/widgets/naobike/stations_map.dart';
+import 'package:sortir_a_nantes/models/bikestation/naolib_station.dart';
+import 'package:sortir_a_nantes/services/bikestation/naolib_service.dart';
+import 'package:sortir_a_nantes/widgets/bikestation/address_search_bar.dart';
+import 'package:sortir_a_nantes/widgets/bikestation/stations_list.dart';
+import 'package:sortir_a_nantes/widgets/bikestation/stations_map.dart';
 
 class FindBikeStationScreen extends StatefulWidget {
   const FindBikeStationScreen({super.key});

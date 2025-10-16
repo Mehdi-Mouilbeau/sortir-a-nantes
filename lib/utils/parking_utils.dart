@@ -1,5 +1,5 @@
 import 'package:geolocator/geolocator.dart';
-import '../models/parking.dart';
+import '../models/parking/parking.dart';
 
 List<Parking> filterNearbyParkings(
   List<Parking> parkings,

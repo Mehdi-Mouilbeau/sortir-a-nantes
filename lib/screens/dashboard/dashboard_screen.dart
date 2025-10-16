@@ -3,9 +3,9 @@ import 'package:sortir_a_nantes/models/dashboard/dashboard_page.dart';
 import 'package:sortir_a_nantes/models/dashboard/dashboard_widget.dart';
 import 'package:sortir_a_nantes/screens/events/events_list_screen.dart';
 import 'package:sortir_a_nantes/screens/weather/weather_config_screen.dart';
-import 'package:sortir_a_nantes/services/dashboard_storage.dart';
+import 'package:sortir_a_nantes/services/dashboard/dashboard_storage.dart';
 import 'package:sortir_a_nantes/services/geocoding_service.dart';
-import 'package:sortir_a_nantes/services/weather_service.dart';
+import 'package:sortir_a_nantes/services/weather/weather_service.dart';
 import 'package:sortir_a_nantes/widgets/dashboard/dashboard_event_card.dart';
 import 'package:sortir_a_nantes/widgets/dashboard/dashboard_weather_card.dart';
 

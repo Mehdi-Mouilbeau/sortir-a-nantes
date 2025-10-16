@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:sortir_a_nantes/widgets/event_card_list.dart';
-import '../../models/event.dart';
+import 'package:sortir_a_nantes/widgets/events/event_card_list.dart';
+import '../../models/event/event.dart';
 import './event_detail_screen.dart';
-import '../../services/event_service.dart';
+import '../../services/events/event_service.dart';
 import '../../widgets/city_dropdown.dart';
 import '../../widgets/date_filter_dropdown.dart';
 import '../../widgets/theme_dropdown.dart';

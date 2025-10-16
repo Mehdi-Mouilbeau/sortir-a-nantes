@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:sortir_a_nantes/models/parking.dart';
-import 'package:sortir_a_nantes/services/parking_service.dart';
+import 'package:sortir_a_nantes/models/parking/parking.dart';
+import 'package:sortir_a_nantes/services/parkings/parking_service.dart';
 import 'package:sortir_a_nantes/utils/maps_redirection.dart';
 import 'package:sortir_a_nantes/utils/parking_utils.dart';
 

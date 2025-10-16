@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sortir_a_nantes/models/event.dart';
+import 'package:sortir_a_nantes/models/event/event.dart';
 
 class EventCardList extends StatelessWidget {
   final Event event;

@@ -1,17 +1,49 @@
-# sortir_a_nantes
+# 🌆 Sortir à Nantes
 
-A new Flutter project.
+Une application Flutter pour découvrir les événements, lieux et activités à Nantes.  
+Elle utilise la géolocalisation, un calendrier interactif et des notifications locales.
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+## 🚀 Prérequis
 
-A few resources to get you started if this is your first Flutter project:
+Avant de lancer le projet, assure-toi d’avoir installé :
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- **Flutter 3.32.0**
+- **Dart 3.8.0**
+- **Gradle 8.13**
+- **Java JDK 17**
+- **Android Studio** ou **VS Code** avec les extensions Flutter/Dart
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-# sortir-a-nantes
+## API
+
+Une clé API https://openweathermap.org/api est nécessaire pour l'application
+
+- API_WEATHER_KEY=ta_cle_api
+
+- pubspec.yaml : 
+
+flutter:
+  assets:
+    - .env
+
+## Lancement de l'application
+
+- flutter pub get
+- flutter run
+
+## Permissions déjà configurer dans AndroidManifest.xml
+
+<!-- Localisation -->
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+<uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
+
+<!-- Alarmes et notifications -->
+<uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+<uses-permission android:name="android.permission.USE_EXACT_ALARM"/>
+<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+<uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+
+<!-- Réseau -->
+<uses-permission android:name="android.permission.INTERNET"/>

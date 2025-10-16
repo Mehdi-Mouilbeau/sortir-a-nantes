@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:sortir_a_nantes/models/event.dart';
+import 'package:sortir_a_nantes/models/event/event.dart';
 import 'package:sortir_a_nantes/screens/parkings/parking_screen.dart';
-import 'package:sortir_a_nantes/screens/velib/naolib_event_screen.dart';
+import 'package:sortir_a_nantes/screens/bikestation/naolib_event_screen.dart';
 import 'package:sortir_a_nantes/services/notification_service.dart';
 import 'package:sortir_a_nantes/utils/date_utils.dart';
 
