@@ -8,6 +8,7 @@ import 'package:sortir_a_nantes/services/geocoding_service.dart';
 import 'package:sortir_a_nantes/services/weather/weather_service.dart';
 import 'package:sortir_a_nantes/widgets/dashboard/dashboard_event_card.dart';
 import 'package:sortir_a_nantes/widgets/dashboard/dashboard_weather_card.dart';
+import 'package:sortir_a_nantes/widgets/weather/weather_widget.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -71,37 +72,34 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   void _addWeatherWidget() async {
-    final city = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => WeatherConfigScreen()),
-    );
-    if (city != null) {
-      final coords = await GeocodingService.getCoordinates(city);
-      if (coords != null) {
-        final weatherData = await WeatherService().getCurrentWeather(coords.latitude, coords.longitude);
-        final airQualityData = await WeatherService().getAirQuality(coords.latitude, coords.longitude);
+  // Ouvre l'écran de configuration pour choisir une ville
+  final city = await Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => WeatherConfigScreen()),
+  );
 
-        if (weatherData != null) {
-          weatherData['air_quality'] = airQualityData ?? {};
-          _addWidgetToPage(
-            DashboardWidget(
-              widget: DashboardWeatherCard(
-                weatherData: weatherData,
-                city: city,
-                airQualityData: airQualityData,
-              ),
-              type: 'weather',
-              data: {
-                'city': city,
-                'weatherData': weatherData,
-                'airQualityData': airQualityData,
-              },
-            ),
-          );
-        }
-      }
+  if (city != null) {
+    // Récupère les coordonnées de la ville
+    final coords = await GeocodingService.getCoordinates(city);
+
+    if (coords != null) {
+      // On n'a plus besoin de récupérer weatherData ici puisque WeatherWidget le fera
+      _addWidgetToPage(
+        DashboardWidget(
+          widget: WeatherWidget(
+            latitude: coords.latitude,
+            longitude: coords.longitude,
+          ),
+          type: 'weather',
+          data: {
+            'city': city,
+          },
+        ),
+      );
     }
   }
+}
+
 
   void _showAddWidgetDialog() {
     showDialog(

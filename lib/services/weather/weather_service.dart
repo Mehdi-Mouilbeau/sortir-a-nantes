@@ -8,7 +8,7 @@ class WeatherService {
   Future<Map<String, dynamic>?> getCurrentWeather(
       double latitude, double longitude) async {
     final url =
-        'https://api.openweathermap.org/data/2.5/onecall?lat=$latitude&lon=$longitude&units=metric&lang=fr&appid=$apiKey';
+        'https://api.openweathermap.org/data/2.5/weather?lat=$latitude&lon=$longitude&units=metric&lang=fr&appid=$apiKey';
 
     try {
       final response = await http.get(Uri.parse(url));

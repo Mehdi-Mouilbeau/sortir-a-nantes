@@ -60,7 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  WeatherWidget(latitude: 47.2184, longitude: -1.5536),
+                  Expanded(child: WeatherWidget(latitude: 47.2184, longitude: -1.5536)),
                 ],
               ),
               const SizedBox(height: 12),
